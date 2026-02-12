@@ -9,21 +9,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout repository
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Setup Java 11
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
           java-version: '11'
           distribution: 'temurin'
 
+      # Build project
       - name: Build with Maven
         run: mvn clean install
 
+      # OWASP Dependency Check with NVD API Key
       - name: OWASP Dependency Check
-        run: mvn org.owasp:dependency-check-maven:check -DautoUpdate=false
+        run: mvn org.owasp:dependency-check-maven:check
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
+      # Build Docker image
       - name: Build Docker Image
         run: docker build -t security-demo .
-
